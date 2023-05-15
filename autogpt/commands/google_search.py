@@ -11,7 +11,7 @@ from autogpt.config import Config
 CFG = Config()
 
 
-@command("google", "Google Search", '"query": "<query>"', not CFG.google_api_key)
+@command("google", "Google Search", '"query": "<query>"', False)
 def google_search(query: str, num_results: int = 8) -> str:
     """Return the results of a Google search
 
@@ -41,8 +41,9 @@ def google_search(query: str, num_results: int = 8) -> str:
     "google",
     "Google Search",
     '"query": "<query>"',
-    bool(CFG.google_api_key),
+#    bool(CFG.google_api_key),
     "Configure google_api_key.",
+    False
 )
 def google_official_search(query: str, num_results: int = 8) -> str | list[str]:
     """Return the results of a Google search using the official Google API
