@@ -8,6 +8,7 @@ from requests import Response
 from autogpt.config import Config
 from autogpt.processing.html import extract_hyperlinks, format_hyperlinks
 from autogpt.url_utils.validators import validate_url
+from autogpt.improved_robo_checker import RoboCheckerInstance
 
 CFG = Config()
 
@@ -33,6 +34,10 @@ def get_response(
         requests.exceptions.RequestException: If the HTTP request fails
     """
     try:
+        allowed = RoboCheckerInstance.is_allowed(url, CFG.user_agent)
+        if not allowed:
+            return None, f'Error: Not allowed to access {url}'
+        
         response = session.get(url, timeout=timeout)
 
         # Check if the response contains an HTTP error

@@ -25,9 +25,11 @@ from autogpt.commands.command import command
 from autogpt.config import Config
 from autogpt.processing.html import extract_hyperlinks, format_hyperlinks
 from autogpt.url_utils.validators import validate_url
+from autogpt.improved_robo_checker import RoboCheckerInstance
 
 FILE_DIR = Path(__file__).parent.parent
 CFG = Config()
+ua = 'Test Auto GPT'
 
 
 @command(
@@ -46,6 +48,9 @@ def browse_website(url: str, question: str) -> str:
     Returns:
         Tuple[str, WebDriver]: The answer and links to the user and the webdriver
     """
+    allowed = RoboCheckerInstance.is_allowed(url, ua)
+    if not allowed:
+        return f'Error: NOT ALLOWED to scrape {url}'
     try:
         driver, text = scrape_text_with_selenium(url)
     except WebDriverException as e:
@@ -84,9 +89,7 @@ def scrape_text_with_selenium(url: str) -> tuple[WebDriver, str]:
     }
 
     options = options_available[CFG.selenium_web_browser]()
-    options.add_argument(
-        "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.5615.49 Safari/537.36"
-    )
+    options.add_argument(f"user-agent={ua}")
 
     if CFG.selenium_web_browser == "firefox":
         if CFG.selenium_headless:
@@ -182,9 +185,12 @@ def add_header(driver: WebDriver) -> None:
     Returns:
         None
     """
+    """
     try:
         with open(f"{FILE_DIR}/js/overlay.js", "r") as overlay_file:
             overlay_script = overlay_file.read()
         driver.execute_script(overlay_script)
     except Exception as e:
         print(f"Error executing overlay.js: {e}")
+    """
+    print('Not adding overlay!')

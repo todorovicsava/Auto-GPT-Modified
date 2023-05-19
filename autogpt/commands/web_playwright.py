@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from autogpt.logs import logger
+from autogpt.improved_robo_checker import RoboCheckerInstance
 
 try:
     from playwright.sync_api import sync_playwright
@@ -23,6 +24,9 @@ def scrape_text(url: str) -> str:
     Returns:
         str: The scraped text
     """
+    allowed = RoboCheckerInstance.is_allowed(url, 'Test Auto GPT')
+    if not allowed:
+        return f'Error: NOT ALLOWED to access {url}'
     with sync_playwright() as p:
         browser = p.chromium.launch()
         page = browser.new_page()
@@ -58,6 +62,9 @@ def scrape_links(url: str) -> str | list[str]:
     Returns:
         Union[str, List[str]]: The scraped links
     """
+    allowed = RoboCheckerInstance.is_allowed(url, 'Test Auto GPT')
+    if not allowed:
+        return f'Error: NOT ALLOWED to access {url}'
     with sync_playwright() as p:
         browser = p.chromium.launch()
         page = browser.new_page()
